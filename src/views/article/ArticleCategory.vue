@@ -27,41 +27,51 @@ const categorys = ref([
 ]);
 
 //获取所有文章分类数据
-import { articleCategoryListService,articleCategoryAddService } from "@/api/article.js";
+import { articleCategoryListService, articleCategoryAddService } from "@/api/article.js";
 const getAllCategory = async () => {
   let result = await articleCategoryListService();
   categorys.value = result.data;
 };
 getAllCategory();
 
-
 //控制添加分类弹窗
-const dialogVisible = ref(false)
+const dialogVisible = ref(false);
 
 //添加分类数据模型
 const categoryModel = ref({
-    categoryName: '',
-    categoryAlias: ''
-})
+  categoryName: "",
+  categoryAlias: "",
+});
 //添加分类表单校验
 const rules = {
-    categoryName: [
-        { required: true, message: '请输入分类名称', trigger: 'blur' },
-    ],
-    categoryAlias: [
-        { required: true, message: '请输入分类别名', trigger: 'blur' },
-    ]
-}
+  categoryName: [{ required: true, message: "请输入分类名称", trigger: "blur" }],
+  categoryAlias: [{ required: true, message: "请输入分类别名", trigger: "blur" }],
+};
 
 //访问后台，添加文章分类
-const addCategory = async ()=>{
-    let result = await articleCategoryAddService(categoryModel.value);
-    ElMessage.success(result.message? result.message:'添加成功')
-    //隐藏弹窗
-    dialogVisible.value = false
-    //再次访问后台接口，查询所有分类
-    getAllCategory()
-}
+const addCategory = async () => {
+  let result = await articleCategoryAddService(categoryModel.value);
+  ElMessage.success(result.message ? result.message : "添加成功");
+  //隐藏弹窗
+  dialogVisible.value = false;
+  //再次访问后台接口，查询所有分类
+  getAllCategory();
+};
+
+//弹窗标题
+const title = ref("");
+
+//修改分类回显
+const updateCategoryEcho = (row) => {
+//   title.value = "修改分类";
+  title.value = "编辑分类";
+  dialogVisible.value = true;
+  //将row中的数据赋值给categoryModel
+  categoryModel.value.categoryName = row.categoryName;
+  categoryModel.value.categoryAlias = row.categoryAlias;
+  //修改的时候必须传递分类的id，所以扩展一个id属性
+  categoryModel.value.id = row.id;
+};
 </script>
 <template>
   <el-card class="page-container">
@@ -69,7 +79,14 @@ const addCategory = async ()=>{
       <div class="header">
         <span>文章分类</span>
         <div class="extra">
-          <el-button type="primary"  @click="dialogVisible = true">添加分类</el-button>
+          <el-button
+            type="primary"
+            @click="
+              dialogVisible = true;
+              title = '添加分类';
+            "
+            >添加分类</el-button
+          >
         </div>
       </div>
     </template>
@@ -79,7 +96,13 @@ const addCategory = async ()=>{
       <el-table-column label="分类别名" prop="categoryAlias"></el-table-column>
       <el-table-column label="操作" width="100">
         <template #default="{ row }">
-          <el-button :icon="Edit" circle plain type="primary"></el-button>
+          <el-button
+            :icon="Edit"
+            circle
+            plain
+            type="primary"
+            @click="updateCategoryEcho(row)"
+          ></el-button>
           <el-button :icon="Delete" circle plain type="danger"></el-button>
         </template>
       </el-table-column>
@@ -89,7 +112,7 @@ const addCategory = async ()=>{
     </el-table>
 
     <!-- 添加分类弹窗 -->
-    <el-dialog v-model="dialogVisible" title="添加弹层" width="30%">
+    <el-dialog v-model="dialogVisible" :title="title" width="30%">
       <el-form
         :model="categoryModel"
         :rules="rules"
