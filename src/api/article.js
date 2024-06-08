@@ -20,3 +20,8 @@ export const articleCategoryListService = () => {
 export const articleCategoryAddService = (categoryModel) => {
     return request.post('/category', categoryModel)
 }
+
+//修改分类
+export const articleCategoryUpdateService = (categoryModel)=>{
+    return request.put('/category',categoryModel)
+}

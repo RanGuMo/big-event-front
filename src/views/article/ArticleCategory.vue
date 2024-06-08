@@ -27,7 +27,7 @@ const categorys = ref([
 ]);
 
 //获取所有文章分类数据
-import { articleCategoryListService, articleCategoryAddService } from "@/api/article.js";
+import { articleCategoryListService, articleCategoryAddService,articleCategoryUpdateService } from "@/api/article.js";
 const getAllCategory = async () => {
   let result = await articleCategoryListService();
   categorys.value = result.data;
@@ -63,7 +63,7 @@ const title = ref("");
 
 //修改分类回显
 const updateCategoryEcho = (row) => {
-//   title.value = "修改分类";
+  //   title.value = "修改分类";
   title.value = "编辑分类";
   dialogVisible.value = true;
   //将row中的数据赋值给categoryModel
@@ -71,6 +71,21 @@ const updateCategoryEcho = (row) => {
   categoryModel.value.categoryAlias = row.categoryAlias;
   //修改的时候必须传递分类的id，所以扩展一个id属性
   categoryModel.value.id = row.id;
+};
+
+//修改分类
+const updateCategory = async () => {
+  let result = await articleCategoryUpdateService(categoryModel.value);
+  ElMessage.success(result.message ? result.message : "修改成功");
+  //隐藏弹窗
+  dialogVisible.value = false;
+  //再次访问后台接口，查询所有分类
+  getAllCategory();
+};
+
+//清空模型数据
+const clearCategoryModel = () => {
+  (categoryModel.value.categoryName = ""), (categoryModel.value.categoryAlias = "");
 };
 </script>
 <template>
@@ -84,6 +99,7 @@ const updateCategoryEcho = (row) => {
             @click="
               dialogVisible = true;
               title = '添加分类';
+              clearCategoryModel();
             "
             >添加分类</el-button
           >
@@ -137,7 +153,12 @@ const updateCategoryEcho = (row) => {
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="addCategory"> 确认 </el-button>
+          <el-button
+            type="primary"
+            @click="title === '添加分类' ? addCategory() : updateCategory()"
+          >
+            确认
+          </el-button>
         </span>
       </template>
     </el-dialog>
