@@ -87,13 +87,41 @@ const onCurrentChange = (num) => {
 
 
 //文章列表查询
-import { articleCategoryListService } from '@/api/article.js'
+import { articleCategoryListService,articleListService } from '@/api/article.js'
 const getArticleCategoryList = async () => {
     //获取所有分类
     let resultC = await articleCategoryListService();
     categorys.value = resultC.data
 }
+
+
+//文章列表查询
+const getArticles = async () => {
+    let params = {
+        pageNum: pageNum.value,
+        pageSize: pageSize.value,
+        categoryId: categoryId.value ? categoryId.value : null,
+        state: state.value ? state.value : null
+    }
+    let result = await articleListService(params);
+    //渲染列表数据
+    articles.value = result.data.items
+    //为列表中添加categoryName属性
+    for(let i=0;i<articles.value.length;i++){
+        let article = articles.value[i];
+        for(let j=0;j<categorys.value.length;j++){
+            if(article.categoryId===categorys.value[j].id){
+                article.categoryName=categorys.value[j].categoryName
+            }
+        }
+    }
+    //渲染总条数
+    total.value=result.data.total
+}
+
+
 getArticleCategoryList();
+getArticles();
 </script>
 <template>
     <el-card class="page-container">
@@ -132,7 +160,8 @@ getArticleCategoryList();
         <!-- 文章列表 -->
         <el-table :data="articles" style="width: 100%">
             <el-table-column label="文章标题" width="400" prop="title"></el-table-column>
-            <el-table-column label="分类" prop="categoryId"></el-table-column>
+            <!-- <el-table-column label="分类" prop="categoryId"></el-table-column> -->
+            <el-table-column label="分类" prop="categoryName"></el-table-column>
             <el-table-column label="发表时间" prop="createTime"> </el-table-column>
             <el-table-column label="状态" prop="state"></el-table-column>
             <el-table-column label="操作" width="100">
