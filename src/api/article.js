@@ -5,11 +5,12 @@ import { useTokenStore } from "@/stores/token";
 
 //文章分类列表查询
 export const articleCategoryListService = () => {
-  // return request.get('/category')
-  //获取token状态
-  const tokenStore = useTokenStore();
-  //通过请求头Authorization携带token
-  return request.get("/category", {
-    headers: { Authorization: tokenStore.token },
-  });
+  //   // return request.get('/category')
+  //   //获取token状态
+  //   const tokenStore = useTokenStore();
+  //   //通过请求头Authorization携带token
+  //   return request.get("/category", {
+  //     headers: { Authorization: tokenStore.token },
+  //   });
+  return request.get("/category");
 };
