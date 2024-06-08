@@ -14,3 +14,9 @@ export const articleCategoryListService = () => {
   //   });
   return request.get("/category");
 };
+
+
+//添加文章分类
+export const articleCategoryAddService = (categoryModel) => {
+    return request.post('/category', categoryModel)
+}
