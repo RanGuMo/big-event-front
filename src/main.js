@@ -12,10 +12,14 @@ const persist = createPersistedState()
 //pinia使用持久化插件
 pinia.use(persist)
 
+// 使用中文语言包
+import locale from 'element-plus/dist/locale/zh-cn.js'
+
+
 
 const app = createApp(App)
 
 app.use(pinia)
 app.use(router)
-app.use(ElementPlus)
+app.use(ElementPlus,{locale})
 app.mount('#app')
