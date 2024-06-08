@@ -1,7 +1,8 @@
 <script setup>
 import { User, Lock } from "@element-plus/icons-vue";
 import { ref } from "vue";
-import { registerService,loginService } from "@/api/user.js";
+import { registerService, loginService } from "@/api/user.js";
+import { ElMessage } from "element-plus";
 
 //控制注册与登录表单的显示， 默认显示注册
 const isRegister = ref(false);
@@ -39,32 +40,35 @@ const registerDataRules = ref({
 const register = async () => {
   //console.log('注册...');
   let result = await registerService(registerData.value);
-  if (result.code == 0) {
-    alert("注册成功!");
-  } else {
-    alert("注册失败!");
-  }
+  //   if (result.code == 0) {
+  //     alert("注册成功!");
+  //   } else {
+  //     alert("注册失败!");
+  //   }
+  //   alert("注册成功!");
+  ElMessage.success("注册成功!");
 };
 
-const login =async () =>{
-    //console.log('登录...');
-    let result = await loginService(registerData.value)
-    if(result.code==0){
-        alert('登录成功!')
-    }else{
-        alert('登录失败!')
-    }
-}
-
+const login = async () => {
+  //console.log('登录...');
+  let result = await loginService(registerData.value);
+  //   if (result.code == 0) {
+  //     alert("登录成功!");
+  //   } else {
+  //     alert("登录失败!");
+  //   }
+  //   alert("登录成功!");
+  ElMessage.success("登录成功!");
+};
 
 //清空数据模型的数据
 const clearRegisterData = () => {
-    registerData.value = {
-        username: '',
-        password: '',
-        rePassword: ''
-    }
-}
+  registerData.value = {
+    username: "",
+    password: "",
+    rePassword: "",
+  };
+};
 </script>
 
 <template>
@@ -108,22 +112,41 @@ const clearRegisterData = () => {
         </el-form-item>
         <!-- 注册按钮 -->
         <el-form-item>
-          <el-button class="button" type="primary" auto-insert-space @click="register"> 注册 </el-button>
+          <el-button class="button" type="primary" auto-insert-space @click="register">
+            注册
+          </el-button>
         </el-form-item>
         <el-form-item class="flex">
-          <el-link type="info" :underline="false" @click="isRegister = false;clearRegisterData()">
+          <el-link
+            type="info"
+            :underline="false"
+            @click="
+              isRegister = false;
+              clearRegisterData();
+            "
+          >
             ← 返回
           </el-link>
         </el-form-item>
       </el-form>
       <!-- 登录表单 -->
-      <el-form ref="form" size="large" autocomplete="off" v-else :model="registerData"
-        :rules="registerDataRules">
+      <el-form
+        ref="form"
+        size="large"
+        autocomplete="off"
+        v-else
+        :model="registerData"
+        :rules="registerDataRules"
+      >
         <el-form-item>
           <h1>登录</h1>
         </el-form-item>
         <el-form-item prop="username">
-          <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.username"></el-input>
+          <el-input
+            :prefix-icon="User"
+            placeholder="请输入用户名"
+            v-model="registerData.username"
+          ></el-input>
         </el-form-item>
         <el-form-item prop="password">
           <el-input
@@ -142,10 +165,19 @@ const clearRegisterData = () => {
         </el-form-item>
         <!-- 登录按钮 -->
         <el-form-item>
-          <el-button class="button" type="primary" auto-insert-space @click="login">登录</el-button>
+          <el-button class="button" type="primary" auto-insert-space @click="login"
+            >登录</el-button
+          >
         </el-form-item>
         <el-form-item class="flex">
-          <el-link type="info" :underline="false" @click="isRegister = true;clearRegisterData()">
+          <el-link
+            type="info"
+            :underline="false"
+            @click="
+              isRegister = true;
+              clearRegisterData();
+            "
+          >
             注册 →
           </el-link>
         </el-form-item>
