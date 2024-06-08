@@ -3,8 +3,13 @@ import { User, Lock } from "@element-plus/icons-vue";
 import { ref } from "vue";
 import { registerService, loginService } from "@/api/user.js";
 import { ElMessage } from "element-plus";
-import { useRouter } from 'vue-router'
+import { useRouter } from "vue-router";
 const router = useRouter();
+
+//导入token状态
+import { useTokenStore } from "@/stores/token.js";
+//调用useTokenStore得到状态
+const tokenStore = useTokenStore();
 
 //控制注册与登录表单的显示， 默认显示注册
 const isRegister = ref(false);
@@ -61,7 +66,9 @@ const login = async () => {
   //   }
   //   alert("登录成功!");
   ElMessage.success("登录成功!");
-  router.push('/')
+  //保存token
+  tokenStore.setToken(result.data);
+  router.push("/");
 };
 
 //清空数据模型的数据
