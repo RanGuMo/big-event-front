@@ -5,7 +5,7 @@ import axios from "axios";
 import { ElMessage } from "element-plus";
 
 //导入token状态
-import { useTokenStore } from '@/stores/token.js';
+import { useTokenStore } from "@/stores/token.js";
 
 //定义一个变量,记录公共的前缀  ,  baseURL
 const baseURL = "/api";
@@ -28,6 +28,8 @@ instance.interceptors.request.use(
   }
 );
 
+import router from "@/router";
+
 //添加响应拦截器
 instance.interceptors.response.use(
   (result) => {
@@ -41,7 +43,14 @@ instance.interceptors.response.use(
     return Promise.reject(result.data); //异步的状态转化成失败的状态
   },
   (err) => {
-    alert("服务异常");
+    //如果响应状态码时401，代表未登录，给出对应的提示，并跳转到登录页
+    if (err.response.status === 401) {
+      ElMessage.error("请先登录！");
+      router.push("/login");
+    } else {
+      ElMessage.error("服务异常");
+      // alert("服务异常");
+    }
     return Promise.reject(err); //异步的状态转化成失败的状态
   }
 );
