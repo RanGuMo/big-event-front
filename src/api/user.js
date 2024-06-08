@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-//注册
+//注册 (后端请求体类型是x-www-form-urlencoded 格式，所以需要使用 URLSearchParams)
 export const registerService = (registerData) => {
     var params = new URLSearchParams()
     for (let key in registerData) {
@@ -8,6 +8,12 @@ export const registerService = (registerData) => {
     }
     return request.post('/user/register', params)
 }
+
+// 简写
+// export const registerService = (registerData) => {
+//     const params = new URLSearchParams(registerData);
+//     return request.post('/user/register', params);
+// }
 
 //登录
 export const loginService = (loginData)=>{
@@ -17,3 +23,4 @@ export const loginService = (loginData)=>{
     }
     return request.post('/user/login',params)
 }
+
