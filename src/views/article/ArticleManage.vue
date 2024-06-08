@@ -79,10 +79,12 @@ const pageSize = ref(3)//每页条数
 //当每页条数发生了变化，调用此函数
 const onSizeChange = (size) => {
     pageSize.value = size
+    getArticles();
 }
 //当前页码发生变化，调用此函数
 const onCurrentChange = (num) => {
     pageNum.value = num
+    getArticles();
 }
 
 
@@ -153,8 +155,8 @@ getArticles();
                 </el-select>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary">搜索</el-button>
-                <el-button>重置</el-button>
+                <el-button type="primary" @click="getArticles">搜索</el-button>
+                <el-button @click="categoryId='';state='';getArticles()">重置</el-button>
             </el-form-item>
         </el-form>
         <!-- 文章列表 -->
