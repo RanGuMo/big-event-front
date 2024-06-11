@@ -92,6 +92,7 @@ import {
   articleCategoryListService,
   articleListService,
   articleAddService,
+  articleUpdateService
 } from "@/api/article.js";
 const getArticleCategoryList = async () => {
   //获取所有分类
@@ -149,7 +150,7 @@ const uploadSuccess = (img) => {
   articleModel.value.coverImg = img.data;
 };
 
-import {ElMessage } from 'element-plus'
+import { ElMessage } from "element-plus";
 //添加文章
 const addArticle = async (state) => {
   articleModel.value.state = state;
@@ -160,6 +161,45 @@ const addArticle = async (state) => {
   //隐藏抽屉
   visibleDrawer.value = false;
 };
+
+const title = ref("添加文章");
+//清空模型数据
+const clearArticleModel = () => {
+  articleModel.value.title = "";
+  articleModel.value.categoryId = "";
+  articleModel.value.coverImg = "";
+  articleModel.value.content = "";
+  articleModel.value.state = "";
+  //清空图片
+  uploadRef.value.clearFiles();
+};
+
+//修改文章回显
+const editArticle = (row) => {
+  title.value = "编辑文章";
+  visibleDrawer.value = true;
+  //将row中的数据赋值给 articleModel
+  articleModel.value.title = row.title;
+  articleModel.value.categoryId =row.categoryId;
+  articleModel.value.coverImg = row.coverImg;
+  articleModel.value.content = row.content;
+  articleModel.value.state = row.state;
+  
+  //修改的时候必须传递分类的id，所以扩展一个id属性
+  articleModel.value.id = row.id;
+};
+
+//编辑文章
+const updateArticle = async (state) => {
+  articleModel.value.state = state;
+  let result = await articleUpdateService(articleModel.value);
+  ElMessage.success(result.message ? result.message : "修改成功");
+  //再次调用getArticles,获取文章
+  getArticles();
+  //隐藏抽屉
+  visibleDrawer.value = false;
+};
+
 </script>
 <template>
   <el-card class="page-container">
@@ -167,7 +207,13 @@ const addArticle = async (state) => {
       <div class="header">
         <span>文章管理</span>
         <div class="extra">
-          <el-button type="primary" @click="visibleDrawer = true"
+          <el-button
+            type="primary"
+            @click="
+              visibleDrawer = true;
+              title = '添加文章';
+              clearArticleModel();
+            "
             >添加文章</el-button
           >
         </div>
@@ -207,18 +253,20 @@ const addArticle = async (state) => {
     </el-form>
     <!-- 文章列表 -->
     <el-table :data="articles" style="width: 100%">
-      <el-table-column
-        label="文章标题"
-        width="400"
-        prop="title"
-      ></el-table-column>
+      <el-table-column label="文章标题" width="400" prop="title"></el-table-column>
       <!-- <el-table-column label="分类" prop="categoryId"></el-table-column> -->
       <el-table-column label="分类" prop="categoryName"></el-table-column>
       <el-table-column label="发表时间" prop="createTime"> </el-table-column>
       <el-table-column label="状态" prop="state"></el-table-column>
       <el-table-column label="操作" width="100">
         <template #default="{ row }">
-          <el-button :icon="Edit" circle plain type="primary"></el-button>
+          <el-button
+            :icon="Edit"
+            circle
+            plain
+            type="primary"
+            @click="editArticle(row)"
+          ></el-button>
           <el-button :icon="Delete" circle plain type="danger"></el-button>
         </template>
       </el-table-column>
@@ -239,19 +287,11 @@ const addArticle = async (state) => {
       style="margin-top: 20px; justify-content: flex-end"
     />
     <!-- 抽屉 -->
-    <el-drawer
-      v-model="visibleDrawer"
-      title="添加文章"
-      direction="rtl"
-      size="50%"
-    >
+    <el-drawer v-model="visibleDrawer" :title="title" direction="rtl" size="50%">
       <!-- 添加文章表单 -->
       <el-form :model="articleModel" label-width="100px">
         <el-form-item label="文章标题">
-          <el-input
-            v-model="articleModel.title"
-            placeholder="请输入标题"
-          ></el-input>
+          <el-input v-model="articleModel.title" placeholder="请输入标题"></el-input>
         </el-form-item>
         <el-form-item label="文章分类">
           <el-select placeholder="请选择" v-model="articleModel.categoryId">
@@ -295,10 +335,8 @@ const addArticle = async (state) => {
           </div>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="addArticle('已发布')"
-            >发布</el-button
-          >
-          <el-button type="info" @click="addArticle('草稿')">草稿</el-button>
+          <el-button type="primary" @click="title === '添加文章' ? addArticle('已发布'): updateArticle('已发布')">发布</el-button>
+          <el-button type="info" @click="title === '添加文章'?addArticle('草稿'): updateArticle('草稿')">草稿</el-button>
         </el-form-item>
       </el-form>
     </el-drawer>

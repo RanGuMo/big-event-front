@@ -40,3 +40,8 @@ export const articleListService = (params) => {
 export const articleAddService = (articleModel)=>{
     return request.post('/article',articleModel)
 }
+
+//更新文章
+export const articleUpdateService = (articleModel)=>{
+    return request.put('/article',articleModel)
+}
