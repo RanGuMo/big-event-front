@@ -92,7 +92,8 @@ import {
   articleCategoryListService,
   articleListService,
   articleAddService,
-  articleUpdateService
+  articleUpdateService,
+  articleDeleteService
 } from "@/api/article.js";
 const getArticleCategoryList = async () => {
   //获取所有分类
@@ -150,7 +151,7 @@ const uploadSuccess = (img) => {
   articleModel.value.coverImg = img.data;
 };
 
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 //添加文章
 const addArticle = async (state) => {
   articleModel.value.state = state;
@@ -198,6 +199,30 @@ const updateArticle = async (state) => {
   getArticles();
   //隐藏抽屉
   visibleDrawer.value = false;
+};
+
+
+//删除文章
+const deleteArticle = (row) => {
+  ElMessageBox.confirm("你确认删除该文章吗？", "温馨提示", {
+    confirmButtonText: "确认",
+    cancelButtonText: "取消",
+    type: "warning",
+  })
+    .then(async () => {
+      //用户点击了确认
+      let result = await articleDeleteService(row.id);
+      ElMessage.success(result.message ? result.message : "删除成功");
+      //再次调用getArticles，获取所有文章
+      getArticles();
+    })
+    .catch(() => {
+      //用户点击了取消
+      ElMessage({
+        type: "info",
+        message: "取消删除",
+      });
+    });
 };
 
 </script>
@@ -267,7 +292,9 @@ const updateArticle = async (state) => {
             type="primary"
             @click="editArticle(row)"
           ></el-button>
-          <el-button :icon="Delete" circle plain type="danger"></el-button>
+          <el-button :icon="Delete" circle plain type="danger"
+            @click="deleteArticle(row)"
+          ></el-button>
         </template>
       </el-table-column>
       <template #empty>
