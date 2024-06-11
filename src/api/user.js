@@ -41,3 +41,8 @@ export const userAvatarUpdateService=(avatarUrl)=>{
     params.append('avatarUrl',avatarUrl)
     return request.patch('/user/updateAvatar',params)
 }
+
+//更新用户密码
+export const userPasswordUpdateService = (userInfo)=>{
+    return request.patch('/user/updatePwd',userInfo)
+}
