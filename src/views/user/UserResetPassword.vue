@@ -21,7 +21,7 @@ const rules = {
     { min: 5, max: 16, message: "密码长度必须为5~16位", trigger: "blur" },
   ],
   rePassword: [
-    { validator: rePasswordValid, trigger: "blur" },
+    { required: true,validator: rePasswordValid, trigger: "blur" },
     { min: 5, max: 16, message: "密码长度必须为5~16位", trigger: "blur" },
   ],
 };
@@ -35,8 +35,9 @@ import { useUserInfoStore } from "@/stores/user.js";
 const userInfoStore = useUserInfoStore();
 import { useTokenStore } from "@/stores/token.js";
 const tokenStore = useTokenStore();
-
+//修改用户密码
 const updateUserPassword = async () => {
+   await formRef.value.validate()
   let result = await userPasswordUpdateService({
     old_pwd: userInfo.value.oldPassword,
     new_pwd: userInfo.value.newPassword,
@@ -49,6 +50,11 @@ const updateUserPassword = async () => {
   //跳转到登录页
   router.push("/login");
 };
+
+const formRef = ref(null)
+const resetForm = () => {
+  formRef.value.resetFields()
+}
 </script>
 
 <template>
@@ -60,7 +66,7 @@ const updateUserPassword = async () => {
     </template>
     <el-row>
       <el-col :span="12">
-        <el-form :model="userInfo" :rules="rules" label-width="100px" size="large">
+        <el-form :model="userInfo" :rules="rules"  ref="formRef" label-width="100px" size="large">
           <el-form-item label="旧密码" prop="oldPassword">
             <el-input
               v-model="userInfo.oldPassword"
@@ -86,7 +92,8 @@ const updateUserPassword = async () => {
             ></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="updateUserPassword">提交修改</el-button>
+            <el-button type="primary" @click="updateUserPassword">修改密码</el-button>
+             <el-button @click="resetForm">重置</el-button>
           </el-form-item>
         </el-form>
       </el-col>

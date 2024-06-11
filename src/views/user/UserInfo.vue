@@ -24,10 +24,13 @@ const rules = {
   ],
 };
 
+const formRef = ref(null);
+
 //修改用户信息
 import { userInfoUpdateService } from "@/api/user.js";
 import { ElMessage } from "element-plus";
 const updateUserInfo = async () => {
+  await formRef.value.validate();
   let result = await userInfoUpdateService(userInfo.value);
   ElMessage.success(result.message ? result.message : "修改成功");
   //更新pinia中的数据
@@ -45,6 +48,7 @@ const updateUserInfo = async () => {
     <el-row>
       <el-col :span="12">
         <el-form
+          ref="formRef"
           :model="userInfo"
           :rules="rules"
           label-width="100px"
@@ -60,9 +64,7 @@ const updateUserInfo = async () => {
             <el-input v-model="userInfo.email"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="updateUserInfo"
-              >提交修改</el-button
-            >
+            <el-button type="primary" @click="updateUserInfo">提交修改</el-button>
           </el-form-item>
         </el-form>
       </el-col>

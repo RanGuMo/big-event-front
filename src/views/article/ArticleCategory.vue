@@ -33,6 +33,7 @@ import {
   articleCategoryUpdateService,
   articleCategoryDeleteService,
 } from "@/api/article.js";
+// 获取分类列表数据
 const getAllCategory = async () => {
   let result = await articleCategoryListService();
   categorys.value = result.data;
@@ -53,10 +54,13 @@ const rules = {
   categoryAlias: [{ required: true, message: "请输入分类别名", trigger: "blur" }],
 };
 
+const formRef = ref(null);
+
 //访问后台，添加文章分类
 const addCategory = async () => {
+  await formRef.value.validate(); // 表单校验通过才往下走
   let result = await articleCategoryAddService(categoryModel.value);
-  ElMessage.success(result.message ? result.message : "添加成功");
+  ElMessage.success("分类添加成功");
   //隐藏弹窗
   dialogVisible.value = false;
   //再次访问后台接口，查询所有分类
@@ -81,7 +85,7 @@ const updateCategoryEcho = (row) => {
 //修改分类
 const updateCategory = async () => {
   let result = await articleCategoryUpdateService(categoryModel.value);
-  ElMessage.success(result.message ? result.message : "修改成功");
+  ElMessage.success("修改成功");
   //隐藏弹窗
   dialogVisible.value = false;
   //再次访问后台接口，查询所有分类
@@ -115,6 +119,10 @@ const deleteCategory = (row) => {
       });
     });
 };
+
+const resetForm = () => {
+  formRef.value.resetFields();
+};
 </script>
 <template>
   <el-card class="page-container">
@@ -128,6 +136,7 @@ const deleteCategory = (row) => {
               dialogVisible = true;
               title = '添加分类';
               clearCategoryModel();
+              resetForm();
             "
             >添加分类</el-button
           >
@@ -164,6 +173,7 @@ const deleteCategory = (row) => {
     <!-- 添加分类弹窗 -->
     <el-dialog v-model="dialogVisible" :title="title" width="30%">
       <el-form
+        ref="formRef"
         :model="categoryModel"
         :rules="rules"
         label-width="100px"
