@@ -14,6 +14,9 @@ const tokenStore = useTokenStore();
 //控制注册与登录表单的显示， 默认显示注册
 const isRegister = ref(false);
 
+const registerFormRef = ref(null);
+const loginFormRef = ref(null);
+
 //用于注册的数据模型
 const registerData = ref({
   username: "",
@@ -45,6 +48,7 @@ const registerDataRules = ref({
 
 //用于注册的事件函数
 const register = async () => {
+  await registerFormRef.value.validate(); 
   //console.log('注册...');
   let result = await registerService(registerData.value);
   //   if (result.code == 0) {
@@ -57,6 +61,7 @@ const register = async () => {
 };
 
 const login = async () => {
+  await loginFormRef.value.validate(); 
   //console.log('登录...');
   let result = await loginService(registerData.value);
   //   if (result.code == 0) {
@@ -87,12 +92,13 @@ const clearRegisterData = () => {
     <el-col :span="6" :offset="3" class="form">
       <!-- 注册表单 -->
       <el-form
-        ref="form"
+        ref="registerFormRef"
         size="large"
         autocomplete="off"
         v-if="isRegister"
         :model="registerData"
         :rules="registerDataRules"
+       
       >
         <el-form-item>
           <h1>注册</h1>
@@ -141,12 +147,13 @@ const clearRegisterData = () => {
       </el-form>
       <!-- 登录表单 -->
       <el-form
-        ref="form"
+        ref="loginFormRef"
         size="large"
         autocomplete="off"
         v-else
         :model="registerData"
         :rules="registerDataRules"
+      
       >
         <el-form-item>
           <h1>登录</h1>
