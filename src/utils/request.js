@@ -11,6 +11,9 @@ import { useTokenStore } from "@/stores/token.js";
 const baseURL = "/api";
 const instance = axios.create({ baseURL });
 
+// 添加一个变量来记录是否已经显示过登录提示
+let hasShownLoginPrompt = false;
+
 //添加请求拦截器
 instance.interceptors.request.use(
   (config) => {
@@ -45,8 +48,11 @@ instance.interceptors.response.use(
   (err) => {
     //如果响应状态码时401，代表未登录，给出对应的提示，并跳转到登录页
     if (err.response.status === 401) {
-      ElMessage.error("请先登录！");
-      router.push("/login");
+      if (!hasShownLoginPrompt) {
+        ElMessage.error("请先登录！");
+        router.push("/login");
+        hasShownLoginPrompt = true; // 设置标记为已经显示过登录提示(防止重复提示)
+      }
     } else {
       ElMessage.error("服务异常");
       // alert("服务异常");
