@@ -1,6 +1,18 @@
 <script setup>
 import { ref } from "vue";
+//修改用户密码
+import { userPasswordUpdateService } from "@/api/user.js";
+import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
+const router = useRouter();
+
+//导入pinia
+import { useUserInfoStore } from "@/stores/user.js";
+const userInfoStore = useUserInfoStore();
+import { useTokenStore } from "@/stores/token.js";
+const tokenStore = useTokenStore();
 const userInfo = ref({});
+const formRef = ref(null);
 
 //自定义确认密码的校验函数
 const rePasswordValid = (rule, value, callback) => {
@@ -10,6 +22,7 @@ const rePasswordValid = (rule, value, callback) => {
   if (userInfo.value.newPassword !== value) {
     return callback(new Error("新密码和确认密码不一致"));
   }
+  return callback();
 };
 const rules = {
   oldPassword: [
@@ -21,40 +34,33 @@ const rules = {
     { min: 5, max: 16, message: "密码长度必须为5~16位", trigger: "blur" },
   ],
   rePassword: [
-    { required: true,validator: rePasswordValid, trigger: "blur" },
-    { min: 5, max: 16, message: "密码长度必须为5~16位", trigger: "blur" },
+    { required: true, validator: rePasswordValid, trigger: "blur" },
   ],
 };
 
 //修改用户密码
-import { userPasswordUpdateService } from "@/api/user.js";
-import { ElMessage } from "element-plus";
-
-//导入pinia
-import { useUserInfoStore } from "@/stores/user.js";
-const userInfoStore = useUserInfoStore();
-import { useTokenStore } from "@/stores/token.js";
-const tokenStore = useTokenStore();
-//修改用户密码
 const updateUserPassword = async () => {
-   await formRef.value.validate()
-  let result = await userPasswordUpdateService({
-    old_pwd: userInfo.value.oldPassword,
-    new_pwd: userInfo.value.newPassword,
-    re_pwd: userInfo.value.rePassword,
-  });
-  ElMessage.success(result.message ? result.message : "修改成功");
-  //清空pinia中的token和个人信息
-  userInfoStore.info = {};
-  tokenStore.token = "";
-  //跳转到登录页
-  router.push("/login");
+  try {
+    await formRef.value.validate();
+    let result = await userPasswordUpdateService({
+      old_pwd: userInfo.value.oldPassword,
+      new_pwd: userInfo.value.newPassword,
+      re_pwd: userInfo.value.rePassword,
+    });
+    ElMessage.success(result.message ? result.message : "修改成功");
+    // 清空pinia中的token和个人信息
+    userInfoStore.info = {};
+    tokenStore.token = "";
+    // 跳转到登录页
+    router.push("/login");
+  } catch (error) {
+    console.error("验证或更新失败:", error);
+  }
 };
 
-const formRef = ref(null)
 const resetForm = () => {
-  formRef.value.resetFields()
-}
+  formRef.value.resetFields();
+};
 </script>
 
 <template>
@@ -66,7 +72,13 @@ const resetForm = () => {
     </template>
     <el-row>
       <el-col :span="12">
-        <el-form :model="userInfo" :rules="rules"  ref="formRef" label-width="100px" size="large">
+        <el-form
+          :model="userInfo"
+          :rules="rules"
+          ref="formRef"
+          label-width="100px"
+          size="large"
+        >
           <el-form-item label="旧密码" prop="oldPassword">
             <el-input
               v-model="userInfo.oldPassword"
@@ -93,7 +105,7 @@ const resetForm = () => {
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="updateUserPassword">修改密码</el-button>
-             <el-button @click="resetForm">重置</el-button>
+            <el-button @click="resetForm">重置</el-button>
           </el-form-item>
         </el-form>
       </el-col>
