@@ -18,7 +18,9 @@ const tokenStore = useTokenStore();
 //图片上传成功的回调
 const uploadSuccess = (result) => {
   //回显图片
-  imgUrl.value = result.data;
+  // imgUrl.value = result.data;
+  // 使用base64 来显示图片
+  imgUrl.value = 'data:image/png;base64,' +result.data;
 };
 
 //调用接口，更新头像url
