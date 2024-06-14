@@ -135,6 +135,7 @@ const rePasswordValid = (rule, value, callback) => {
     if (registerData.value.password !== value) {
         return callback(new Error('两次输入密码不一致'))
     }
+    return callback();
 }
 //用于注册的表单校验模型
 const registerDataRules = ref({
